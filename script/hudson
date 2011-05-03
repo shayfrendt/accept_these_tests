@@ -1,0 +1,36 @@
+#!/bin/bash
+source "$HOME/.rvm/scripts/rvm"
+`cat .rvmrc`
+bundle install
+
+if pidof Xvfb > /dev/null; then
+  echo "Xvfb is currently running - cool"
+else
+  Xvfb -ac -screen scrn 1280x2000x24 :2.0 &
+fi
+
+export DISPLAY=:2.0
+
+function check_hudson_output(){
+  grep "Failures:" hudson_output.txt > /dev/null
+}
+
+function return_correct_error_code(){
+  check_hudson_output
+
+  return_code=$?
+  if [ $return_code = 0 ]
+  then
+    # Spec failures occurred in the integration test
+    exit 1
+  else
+    # All specs passed
+    exit 0
+  fi
+}
+
+# workaround for Capybara 0.4.0 & Selenium bug where the Unix exit
+# code is always "success", even when the build actually fails
+# https://github.com/jnicklas/capybara/issues/labels/Bug#issue/178
+rake | tee hudson_output.txt
+return_correct_error_code
