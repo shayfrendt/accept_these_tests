@@ -10,3 +10,5 @@ This is a sample template for getting up and running with Selenium acceptance te
 ## Continuous Integration
 
 TODO  (see script/hudson for the script to run the tests headlessly with Xvfb on Ubuntu)
+
+This is a test.  Please ignore.
